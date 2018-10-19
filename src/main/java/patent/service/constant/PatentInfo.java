@@ -10,7 +10,7 @@ public class PatentInfo {
 	public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 	public static final String GetPageList_Url = "http://www.patentstar.cn/comm/GetList.aspx/GetPageList";
 	public static final String DoPatSearch_Url = "http://www.patentstar.cn/my/SmartQuery.aspx/DoPatSearch";
-	public static final String Cookie = "UM_distinctid=166660ccc581f-0677858ae966b4-5e452019-1fa400-166660ccc62191; ASP.NET_SessionId=34wyi2kkjb5uo0klgkkruvko; CNZZDATA4400375=cnzz_eid%3D1754060454-1539308883-null%26ntime%3D1539925740";
+	public static final String Cookie = "ASP.NET_SessionId=hjvfr2b3fjv34ewzt2a0l3l1; UM_distinctid=1668b4a8ab92e9-00466423f2956-5e452019-1fa400-1668b4a8abaed; CNZZDATA4400375=cnzz_eid%3D999054075-1539935076-%26ntime%3D1539935076; ASP.NET_SessionId=hjvfr2b3fjv34ewzt2a0l3l1; UM_distinctid=1668b4a8ab92e9-00466423f2956-5e452019-1fa400-1668b4a8abaed; CNZZDATA4400375=cnzz_eid%3D999054075-1539935076-%26ntime%3D1539935076";
 	public static final String Accept_Language = "Accept-Language";
 	public static final String Accept_Encoding = "Accept-Encoding";
 	public static final String User_Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36";

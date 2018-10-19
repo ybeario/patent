@@ -27,9 +27,9 @@ public class PatentGetList {
 		this.word = keyword.substring(2, keyword.length());
 	}
 
-	OkHttpClient client = new OkHttpClient();
 
-	private String post(String url, String json, String NO) throws IOException {
+	private Response post(String url, String json, String NO) throws IOException {
+		OkHttpClient client = new OkHttpClient();
 		RequestBody body = RequestBody.create(PatentInfo.JSON, json);
 		Request request = new Request.Builder().url(url).addHeader("Origin", PatentInfo.Origin)
 				.addHeader("X-DevTools-Emulate-Network-Conditions-Client-Id", "1BEA51B7890315B52AFC5D8446A53834")
@@ -39,13 +39,13 @@ public class PatentGetList {
 						"http://www.patentstar.cn/My/frmPatentList.aspx?db=CN&No=" + NO + "&kw=" + keyword
 								+ "&Nm=1&etp=&Query=%20(" + word + "%2FAN)&Qsrc=0")
 				.addHeader("Accept-Encoding", PatentInfo.Accept_Encoding)
-				.addHeader("Accept-Language", PatentInfo.Accept_Language)
-				.addHeader("Cookie", PatentInfo.Cookie).post(body).build();
-		client.newBuilder().connectTimeout(100, TimeUnit.SECONDS).writeTimeout(100, TimeUnit.SECONDS).readTimeout(100,TimeUnit.SECONDS);
+				.addHeader("Accept-Language", PatentInfo.Accept_Language).addHeader("Cookie", PatentInfo.Cookie)
+				.post(body).build();
+		client.newBuilder().connectTimeout(100, TimeUnit.SECONDS).writeTimeout(100, TimeUnit.SECONDS).readTimeout(100,
+				TimeUnit.SECONDS);
 		Response response = client.newCall(request).execute();
-		String string = response.body().string();
+		return response;
 
-		return string;
 	}
 
 	private String bowlingJson(String NO) {
@@ -60,6 +60,12 @@ public class PatentGetList {
 		return JsonToMap.mapToJson(jsonBody);
 	}
 
+	/**
+	 * 获取主分类号
+	 * 
+	 * @param string
+	 * @return
+	 */
 	private String handler(String string) {
 		try {
 			Map<String, Object> map = JsonToMap.toMap(string);
@@ -80,13 +86,52 @@ public class PatentGetList {
 
 	}
 
-	public String getResult() throws Exception {
+	/**
+	 * 获取StrSerialNo和StrANX 拼接url
+	 * 
+	 * @param string
+	 * @return
+	 */
+	private Map<String, Object> handlerGetUrl(String string) {
+		try {
+			Map<String, Object> map = JsonToMap.toMap(string);
+			Map<String, Object> result = new HashMap<>();
+			Object object = map.get("d");
+			string = String.valueOf(object);
+			string = string.replace("\\", "");
+			string = StringUtils.removeFirstAndLast(string);
+			map = JsonToMap.toMap(string);
+			object = map.get("rows");
+			string = String.valueOf(object);
+			string = StringUtils.removeFirstAndLast(string);
+			map = JsonToMap.toMap(string);
+			string = StringUtils.removeFirstAndLast(String.valueOf(map.get("StrSerialNo")));
+			result.put("StrSerialNo", string);
+			string = StringUtils.removeFirstAndLast(String.valueOf(map.get("StrANX")));
+			result.put("StrANX", string);
+			return result;
+		} catch (Exception e) {
+			throw e;
+		}
+
+	}
+
+	public String getJsonResult() throws Exception {
 		DoPatSearch doPatSearch = new DoPatSearch(word);
 		String NO = doPatSearch.getResult();
 		String json = bowlingJson(NO);
-		String post = post(PatentInfo.GetPageList_Url, json, NO);
-		String result = handler(post);
+		Response response = post(PatentInfo.GetPageList_Url, json, NO);
+		String result = handler(response.body().string());
 		return result;
 
+	}
+
+	public Map<String, Object> getHtmlResult() throws Exception {
+		DoPatSearch doPatSearch = new DoPatSearch(word);
+		String NO = doPatSearch.getResult();
+		String json = bowlingJson(NO);
+		Response response = post(PatentInfo.GetPageList_Url, json, NO);
+		Map<String, Object> map = handlerGetUrl(response.body().string());
+		return map;
 	}
 }

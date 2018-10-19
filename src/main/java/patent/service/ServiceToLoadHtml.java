@@ -17,12 +17,11 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author Y.bear
- * @version 创建时间：2018年10月9日 下午3:41:35 类说明
+ * @version 创建时间：2018年10月19日 下午2:31:21 类说明
  */
-public class Service {
+public class ServiceToLoadHtml {
 
-	public static void main(String[] args)
-			throws IOException, InterruptedException, ExecutionException, TimeoutException {
+	public void loadHtml() throws IOException, InterruptedException, ExecutionException, TimeoutException {
 		List<String> list = new ArrayList<>();
 		Map<String, String> map = new HashMap<>();
 		long start = System.currentTimeMillis();
@@ -52,7 +51,7 @@ public class Service {
 		ExecutorService pool = Executors.newFixedThreadPool(1);
 		for (String keyword : list) {
 			try {
-				Callable<String> callable = new work(keyword);
+				Callable<String> callable = new WorkToHtml(keyword);
 				Future<String> submit = pool.submit(callable);
 				String string = submit.get(60, TimeUnit.SECONDS);
 				map.put(keyword, string);
@@ -76,19 +75,22 @@ public class Service {
 
 }
 
-class work implements Callable<String> {
+class WorkToHtml implements Callable<String> {
 	private final String keyword;
 
-	public work(String keyword) {
+	public WorkToHtml(String keyword) {
 		this.keyword = keyword;
 	}
 
 	@Override
 	public String call() throws Exception {
 		PatentGetList getList = new PatentGetList(keyword);
-		String result = getList.getResult();
-		System.out.println(Thread.currentThread().getName() + ":" + result);
-		return result;
+		Map<String, Object> urlParas = getList.getHtmlResult();
+		urlParas.put("key", keyword);
+		PatDetails details = new PatDetails();
+		details.getResult(urlParas);
+		String re = "";
+		return re;
 	}
 
 }

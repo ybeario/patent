@@ -24,9 +24,9 @@ public class DoPatSearch {
 		this.word = word;
 	}
 
-	OkHttpClient client = new OkHttpClient();
 
 	private String post(String url, String json) throws IOException {
+		OkHttpClient client = new OkHttpClient();
 		RequestBody body = RequestBody.create(PatentInfo.JSON, json);
 		Request request = new Request.Builder().url(url).addHeader("Origin", PatentInfo.Origin)
 				.addHeader("X-Requested-With", PatentInfo.X_Requested_With)
