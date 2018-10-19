@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,7 +34,8 @@ public class DoPatSearch {
 				.addHeader("Referer", "http://www.patentstar.cn/My/SmartQuery.aspx")
 				.addHeader("Accept-Encoding", PatentInfo.Accept_Encoding)
 				.addHeader("Accept-Language", PatentInfo.Accept_Language)
-				.addHeader("Cookie", PatentInfo.DoPatSearch_Cookie).post(body).build();
+				.addHeader("Cookie", PatentInfo.Cookie).post(body).build();
+		client.newBuilder().connectTimeout(100, TimeUnit.SECONDS).writeTimeout(100, TimeUnit.SECONDS).readTimeout(100, TimeUnit.SECONDS);
 		Response response = client.newCall(request).execute();
 		String string = response.body().string();
 		return string;
@@ -55,7 +57,7 @@ public class DoPatSearch {
 		return list.get(1);
 	}
 
-	public String getResult() throws IOException {
+	public String getResult() throws Exception {
 		String json = bowlingJson(word);
 		String post = post(PatentInfo.DoPatSearch_Url, json);
 		String result = handler(post);

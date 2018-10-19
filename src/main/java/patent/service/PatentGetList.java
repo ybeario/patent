@@ -24,7 +24,7 @@ public class PatentGetList {
 
 	public PatentGetList(String keyword) {
 		this.keyword = keyword;
-		this.word = keyword.substring(2, keyword.length() - 2);
+		this.word = keyword.substring(2, keyword.length());
 	}
 
 	OkHttpClient client = new OkHttpClient();
@@ -40,8 +40,8 @@ public class PatentGetList {
 								+ "&Nm=1&etp=&Query=%20(" + word + "%2FAN)&Qsrc=0")
 				.addHeader("Accept-Encoding", PatentInfo.Accept_Encoding)
 				.addHeader("Accept-Language", PatentInfo.Accept_Language)
-				.addHeader("Cookie", PatentInfo.PatentGetList_Cookie).post(body).build();
-		client.newBuilder().connectTimeout(100, TimeUnit.SECONDS).writeTimeout(100, TimeUnit.SECONDS).readTimeout(100, TimeUnit.SECONDS);
+				.addHeader("Cookie", PatentInfo.Cookie).post(body).build();
+		client.newBuilder().connectTimeout(100, TimeUnit.SECONDS).writeTimeout(100, TimeUnit.SECONDS).readTimeout(100,TimeUnit.SECONDS);
 		Response response = client.newCall(request).execute();
 		String string = response.body().string();
 
@@ -75,13 +75,12 @@ public class PatentGetList {
 			string = StringUtils.removeFirstAndLast(String.valueOf(map.get("StrMainIPC")));
 			return string;
 		} catch (Exception e) {
-			System.out.println("数据转换异常");
+			throw e;
 		}
-		return "获取失败";
 
 	}
 
-	public String getResult() throws IOException {
+	public String getResult() throws Exception {
 		DoPatSearch doPatSearch = new DoPatSearch(word);
 		String NO = doPatSearch.getResult();
 		String json = bowlingJson(NO);
