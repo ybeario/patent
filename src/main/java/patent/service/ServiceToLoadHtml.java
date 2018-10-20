@@ -58,6 +58,7 @@ public class ServiceToLoadHtml {
 			} catch (Exception e) {
 				System.out.println("当前数据异常");
 				map.put(keyword, "异常");
+				e.printStackTrace();
 			} finally {
 				num--;
 				System.out.println("剩余：" + num + "条");
@@ -89,7 +90,7 @@ class WorkToHtml implements Callable<String> {
 		urlParas.put("key", keyword);
 		PatDetails details = new PatDetails();
 		details.getResult(urlParas);
-		String re = "";
+		String re = "test";
 		return re;
 	}
 

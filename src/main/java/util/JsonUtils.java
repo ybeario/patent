@@ -18,7 +18,7 @@ import com.google.gson.reflect.TypeToken;
  * @author Y.bear
  * @version 创建时间：2018年10月9日 上午11:23:34 类说明
  */
-public class JsonToMap {
+public class JsonUtils {
 
 	/**
 	 * 将Map转成json
@@ -61,7 +61,7 @@ public class JsonToMap {
 	 * @return
 	 */
 	public static Map<String, Object> toMap(String json) {
-		return JsonToMap.toMap(JsonToMap.parseJson(json));
+		return JsonUtils.toMap(JsonUtils.parseJson(json));
 	}
 
 	/**

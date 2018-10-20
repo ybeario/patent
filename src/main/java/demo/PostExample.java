@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import util.JsonToMap;
+import util.JsonUtils;
 import util.StringUtils;
 
 /**
@@ -52,20 +52,20 @@ public class PostExample {
 		jsonBody.put("pageindex", "1");
 		jsonBody.put("rows", "10");
 		jsonBody.put("Sort", "PD|DESC");
-		return JsonToMap.mapToJson(jsonBody);
+		return JsonUtils.mapToJson(jsonBody);
 	}
 
 	String handler(String string) {
-		Map<String, Object> map = JsonToMap.toMap(string);
+		Map<String, Object> map = JsonUtils.toMap(string);
 		Object object = map.get("d");
 		string = String.valueOf(object);
 		string = string.replace("\\", "");
 		string = StringUtils.removeFirstAndLast(string);
-		map = JsonToMap.toMap(string);
+		map = JsonUtils.toMap(string);
 		object = map.get("rows");
 		string = String.valueOf(object);
 		string = StringUtils.removeFirstAndLast(string);
-		map = JsonToMap.toMap(string);
+		map = JsonUtils.toMap(string);
 		string = StringUtils.removeFirstAndLast(String.valueOf(map.get("StrMainIPC")));
 		return string;
 

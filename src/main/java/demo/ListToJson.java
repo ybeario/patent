@@ -3,7 +3,7 @@ package demo;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.JsonToMap;
+import util.JsonUtils;
 
 /**
  * @author Y.bear
@@ -16,8 +16,8 @@ public class ListToJson {
 		list.add("d");
 		list.add("2");
 		list.add("?<>");
-		String json = JsonToMap.listToJson(list);
-		List<String> objList = JsonToMap.toList(json,String.class);
+		String json = JsonUtils.listToJson(list);
+		List<String> objList = JsonUtils.toList(json,String.class);
 		for (String string : objList) {
 			System.out.println(string);
 		}
