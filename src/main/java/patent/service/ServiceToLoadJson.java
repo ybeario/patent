@@ -26,7 +26,8 @@ public class ServiceToLoadJson {
 		Map<String, String> map = new HashMap<>();
 		long start = System.currentTimeMillis();
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-
+		System.out.println("请输入需要的字段");
+		String key = bufferedReader.readLine();
 		System.out.println("请输入数据量");
 		int num = Integer.parseInt(bufferedReader.readLine());
 		for (int i = 0; i < num; i++) {
@@ -51,7 +52,7 @@ public class ServiceToLoadJson {
 		ExecutorService pool = Executors.newFixedThreadPool(1);
 		for (String keyword : list) {
 			try {
-				Callable<String> callable = new WorkToJson(keyword);
+				Callable<String> callable = new WorkToJson(keyword, key);
 				Future<String> submit = pool.submit(callable);
 				String string = submit.get(60, TimeUnit.SECONDS);
 				map.put(keyword, string);
@@ -77,16 +78,18 @@ public class ServiceToLoadJson {
 
 class WorkToJson implements Callable<String> {
 	private final String keyword;
+	private final String key;
 
-	public WorkToJson(String keyword) {
+	public WorkToJson(String keyword, String key) {
 		this.keyword = keyword;
+		this.key = key;
 	}
 
 	@Override
 	public String call() throws Exception {
 		PatentGetList getList = new PatentGetList(keyword);
-		String result = getList.getJsonResult();
-		System.out.println(Thread.currentThread().getName() + ":" + result);
+		String result = getList.getJsonResult(key);
+		System.out.println(result);
 		return result;
 	}
 

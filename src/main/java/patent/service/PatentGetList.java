@@ -1,10 +1,5 @@
 package patent.service;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -12,6 +7,11 @@ import okhttp3.Response;
 import patent.service.constant.PatentInfo;
 import util.JsonUtils;
 import util.StringUtils;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Y.bear
@@ -21,6 +21,7 @@ import util.StringUtils;
 public class PatentGetList {
 	public String keyword;
 	public String word;
+
 
 	public PatentGetList(String keyword) {
 		this.keyword = keyword;
@@ -66,7 +67,7 @@ public class PatentGetList {
 	 * @param string
 	 * @return
 	 */
-	private String handler(String string) {
+	private String handler(String string, String key) {
 		try {
 			Map<String, Object> map = JsonUtils.toMap(string);
 			Object object = map.get("d");
@@ -78,7 +79,7 @@ public class PatentGetList {
 			string = String.valueOf(object);
 			string = StringUtils.removeFirstAndLast(string);
 			map = JsonUtils.toMap(string);
-			string = StringUtils.removeFirstAndLast(String.valueOf(map.get("StrMainIPC")));
+			string = StringUtils.removeFirstAndLast(String.valueOf(map.get(key)));
 			return string;
 		} catch (Exception e) {
 			throw e;
@@ -116,12 +117,15 @@ public class PatentGetList {
 
 	}
 
-	public String getJsonResult() throws Exception {
+	public String getJsonResult(String key) throws Exception {
 		DoPatSearch doPatSearch = new DoPatSearch(word);
 		String NO = doPatSearch.getResult();
 		String json = bowlingJson(NO);
 		Response response = post(PatentInfo.GetPageList_Url, json, NO);
-		String result = handler(response.body().string());
+		String result = handler(response.body().string(), key);
+		if (key.equals("StrInventor")) {
+			result = "人数(" + StringUtils.checkNumOfSymbol(result, ';') + ")" + result;
+		}
 		return result;
 
 	}

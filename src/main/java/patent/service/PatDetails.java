@@ -1,19 +1,18 @@
 package patent.service;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.jsoup.nodes.Document;
-
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.jsoup.nodes.Document;
 import patent.service.constant.PatentInfo;
 import util.JsoupUtils;
 import util.StringUtils;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Y.bear
@@ -86,19 +85,25 @@ public class PatDetails {
 
 	}
 
-	public String getResult(Map<String, Object> map) throws IOException {
-		String url = generateUrl(map);
-		String htmlString = getFirstPage(url);
-		Document document = JsoupUtils.getDomFromString(htmlString);
-		System.out.println(document.title() + "----------------");
-		String __VIEWSTATE = JsoupUtils.getElementById(document, "__VIEWSTATE");
-		System.out.println("__VIEWSTATE:" + __VIEWSTATE);
-		String __EVENTVALIDATION = JsoupUtils.getElementById(document, "__EVENTVALIDATION");
-		System.out.println("__EVENTVALIDATION:" + __EVENTVALIDATION);
-		Response response = postToGetLawPage(url, __VIEWSTATE, __EVENTVALIDATION);
-		String html = response.body().string();
-		System.out.println(html);
-		return " ";
+    public String getResult(Map<String, Object> map) throws IOException {
+        String url = generateUrl(map);
+        String htmlString = getFirstPage(url);
+        Document document = JsoupUtils.getDomFromString(htmlString);
+        System.out.println(document.title() + "----------------");
+        String __VIEWSTATE = JsoupUtils.getElementById(document, "__VIEWSTATE");
+        System.out.println("__VIEWSTATE:" + __VIEWSTATE);
+        String __EVENTVALIDATION = JsoupUtils.getElementById(document, "__EVENTVALIDATION");
+        System.out.println("__EVENTVALIDATION:" + __EVENTVALIDATION);
+        Response response = postToGetLawPage(url, __VIEWSTATE, __EVENTVALIDATION);
+        String html = response.body().string();
+        System.out.println(getKeyInfo(html));
+        return html;
 
-	}
+    }
+
+    public String getKeyInfo(String html) {
+        Document document = JsoupUtils.getDomFromString(html);
+        String element = JsoupUtils.getElementById(document, "tdApno");
+        return element;
+    }
 }
