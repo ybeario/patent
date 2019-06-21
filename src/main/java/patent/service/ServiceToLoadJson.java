@@ -36,12 +36,12 @@ public class ServiceToLoadJson {
 				if (temp.length() == 10) {
 					if (temp.startsWith("9")) {
 						StringBuilder builder = new StringBuilder("ZL19");
-						temp = builder.append(temp.substring(0, 3)).append("00")
-								.append(temp.substring(3, temp.length())).toString();
+                        temp = builder.append(temp, 0, 3).append("00")
+                                .append(temp.substring(3)).toString();
 					} else {
 						StringBuilder builder = new StringBuilder("ZL20");
-						temp = builder.append(temp.substring(0, 3)).append("00")
-								.append(temp.substring(3, temp.length())).toString();
+                        temp = builder.append(temp, 0, 3).append("00")
+                                .append(temp.substring(3)).toString();
 					}
 				} else if (temp.length() == 14) {
 					temp = "ZL" + temp;
@@ -89,7 +89,7 @@ class WorkToJson implements Callable<String> {
 	public String call() throws Exception {
 		PatentGetList getList = new PatentGetList(keyword);
 		String result = getList.getJsonResult(key);
-		System.out.println(result);
+        System.out.println(result.trim());
 		return result;
 	}
 
