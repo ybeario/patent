@@ -1,0 +1,309 @@
+Index: src/main/java/patent/service/ServiceToLoadJson.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package patent.service;\r\n\r\nimport java.io.BufferedReader;\r\nimport java.io.IOException;\r\nimport java.io.InputStreamReader;\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\nimport java.util.Map;\r\nimport java.util.concurrent.Callable;\r\nimport java.util.concurrent.ExecutionException;\r\nimport java.util.concurrent.ExecutorService;\r\nimport java.util.concurrent.Executors;\r\nimport java.util.concurrent.Future;\r\nimport java.util.concurrent.TimeUnit;\r\nimport java.util.concurrent.TimeoutException;\r\n\r\n/**\r\n * @author Y.bear\r\n * @version 创建时间：2018年10月9日 下午3:41:35 类说明\r\n */\r\npublic class ServiceToLoadJson {\r\n\r\n\tpublic void loadJson() throws IOException, InterruptedException, ExecutionException, TimeoutException {\r\n\t\tList<String> list = new ArrayList<>();\r\n\t\tMap<String, String> map = new HashMap<>();\r\n\t\tlong start = System.currentTimeMillis();\r\n\t\tBufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));\r\n\t\tSystem.out.println(\"请输入需要的字段\");\r\n\t\tString key = bufferedReader.readLine();\r\n\t\tSystem.out.println(\"请输入数据量\");\r\n\t\tint num = Integer.parseInt(bufferedReader.readLine());\r\n\t\tfor (int i = 0; i < num; i++) {\r\n\t\t\tString temp = bufferedReader.readLine().trim();\r\n\t\t\tif (temp.length() != 16) {\r\n\t\t\t\tif (temp.length() == 10) {\r\n\t\t\t\t\tif (temp.startsWith(\"9\")) {\r\n\t\t\t\t\t\tStringBuilder builder = new StringBuilder(\"ZL19\");\r\n                        temp = builder.append(temp, 0, 3).append(\"00\")\r\n                                .append(temp.substring(3)).toString();\r\n\t\t\t\t\t} else {\r\n\t\t\t\t\t\tStringBuilder builder = new StringBuilder(\"ZL20\");\r\n                        temp = builder.append(temp, 0, 3).append(\"00\")\r\n                                .append(temp.substring(3)).toString();\r\n\t\t\t\t\t}\r\n\t\t\t\t} else if (temp.length() == 14) {\r\n\t\t\t\t\ttemp = \"ZL\" + temp;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tlist.add(temp);\r\n\t\t}\r\n\t\tExecutorService pool = Executors.newFixedThreadPool(1);\r\n\t\tfor (String keyword : list) {\r\n\t\t\ttry {\r\n\t\t\t\tCallable<String> callable = new WorkToJson(keyword, key);\r\n\t\t\t\tFuture<String> submit = pool.submit(callable);\r\n\t\t\t\tString string = submit.get(60, TimeUnit.SECONDS);\r\n\t\t\t\tmap.put(keyword, string);\r\n\t\t\t} catch (Exception e) {\r\n\t\t\t\tSystem.out.println(\"当前数据异常\");\r\n\t\t\t\tmap.put(keyword, \"异常\");\r\n\t\t\t} finally {\r\n\t\t\t\tnum--;\r\n\t\t\t\tSystem.out.println(\"剩余：\" + num + \"条\");\r\n\t\t\t}\r\n\t\t}\r\n\r\n\t\tpool.shutdown();\r\n\r\n\t\tSystem.out.println(\"--------------------------分割线----------------------------\");\r\n\t\tfor (String string : list) {\r\n\t\t\tSystem.out.println(map.get(string));\r\n\t\t}\r\n\t\tSystem.out.println(System.currentTimeMillis() - start);\r\n\t}\r\n\r\n}\r\n\r\nclass WorkToJson implements Callable<String> {\r\n\tprivate final String keyword;\r\n\tprivate final String key;\r\n\r\n\tpublic WorkToJson(String keyword, String key) {\r\n\t\tthis.keyword = keyword;\r\n\t\tthis.key = key;\r\n\t}\r\n\r\n\t@Override\r\n\tpublic String call() throws Exception {\r\n\t\tPatentGetList getList = new PatentGetList(keyword);\r\n\t\tString result = getList.getJsonResult(key);\r\n        System.out.println(result.trim());\r\n\t\treturn result;\r\n\t}\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/patent/service/ServiceToLoadJson.java	(revision 0008bdd0de38a31ac0c0800c6b40c9790f72d4df)
++++ src/main/java/patent/service/ServiceToLoadJson.java	(date 1561102221449)
+@@ -8,89 +8,161 @@
+ import java.util.List;
+ import java.util.Map;
+ import java.util.concurrent.Callable;
+-import java.util.concurrent.ExecutionException;
+ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.Executors;
+ import java.util.concurrent.Future;
+ import java.util.concurrent.TimeUnit;
+-import java.util.concurrent.TimeoutException;
+ 
+ /**
+  * @author Y.bear
+  * @version 创建时间：2018年10月9日 下午3:41:35 类说明
+  */
+ public class ServiceToLoadJson {
++    public static List<String> strApDateList = new ArrayList<>();
++    public static List<String> strAnnDateList = new ArrayList<>();
++    public static List<String> strInventorList = new ArrayList<>();
++    public static List<String> strMainIPCList = new ArrayList<>();
++    public static List<String> strApplyList = new ArrayList<>();
++    public static List<String> strCountryCodeList = new ArrayList<>();
+ 
+-	public void loadJson() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+-		List<String> list = new ArrayList<>();
+-		Map<String, String> map = new HashMap<>();
+-		long start = System.currentTimeMillis();
+-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+-		System.out.println("请输入需要的字段");
+-		String key = bufferedReader.readLine();
+-		System.out.println("请输入数据量");
+-		int num = Integer.parseInt(bufferedReader.readLine());
+-		for (int i = 0; i < num; i++) {
+-			String temp = bufferedReader.readLine().trim();
+-			if (temp.length() != 16) {
+-				if (temp.length() == 10) {
+-					if (temp.startsWith("9")) {
+-						StringBuilder builder = new StringBuilder("ZL19");
++    public void loadJson() throws IOException {
++        List<String> list = new ArrayList<>();
++        Map<String, String> map = new HashMap<>();
++        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
++        //System.out.println("请输入需要的字段");
++        //String key = bufferedReader.readLine();
++        System.out.println("请输入数据量");
++        int num = Integer.parseInt(bufferedReader.readLine());
++        for (int i = 0; i < num; i++) {
++            String temp = bufferedReader.readLine().trim();
++            if (temp.length() != 16) {
++                if (temp.length() == 10) {
++                    if (temp.startsWith("9")) {
++                        StringBuilder builder = new StringBuilder("ZL19");
+                         temp = builder.append(temp, 0, 3).append("00")
+                                 .append(temp.substring(3)).toString();
+-					} else {
+-						StringBuilder builder = new StringBuilder("ZL20");
++                    } else {
++                        StringBuilder builder = new StringBuilder("ZL20");
+                         temp = builder.append(temp, 0, 3).append("00")
+                                 .append(temp.substring(3)).toString();
+-					}
+-				} else if (temp.length() == 14) {
+-					temp = "ZL" + temp;
+-				}
+-			}
+-			list.add(temp);
+-		}
+-		ExecutorService pool = Executors.newFixedThreadPool(1);
+-		for (String keyword : list) {
+-			try {
+-				Callable<String> callable = new WorkToJson(keyword, key);
+-				Future<String> submit = pool.submit(callable);
+-				String string = submit.get(60, TimeUnit.SECONDS);
+-				map.put(keyword, string);
+-			} catch (Exception e) {
+-				System.out.println("当前数据异常");
+-				map.put(keyword, "异常");
+-			} finally {
+-				num--;
+-				System.out.println("剩余：" + num + "条");
+-			}
+-		}
++                    }
++                } else if (temp.length() == 14) {
++                    temp = "ZL" + temp;
++                }
++            }
++            list.add(temp);
++        }
++        ExecutorService pool = Executors.newFixedThreadPool(1);
++        for (String keyword : list) {
++            try {
++                Callable<String> callable = new WorkToJson(keyword);
++                Future<String> submit = pool.submit(callable);
++                String string = submit.get(20, TimeUnit.SECONDS);
++                map.put(keyword, string);
++            } catch (Exception e) {
++                System.out.println("当前数据异常");
++                map.put(keyword, "异常");
++
++            } finally {
++                num--;
++                System.out.println("剩余：" + num + "条");
++            }
++        }
+ 
+-		pool.shutdown();
++        pool.shutdown();
+ 
+-		System.out.println("--------------------------分割线----------------------------");
+-		for (String string : list) {
+-			System.out.println(map.get(string));
+-		}
+-		System.out.println(System.currentTimeMillis() - start);
+-	}
++        System.out.println("--------------------------分割线----------------------------");
++        for (String string : list) {
++            System.out.println(map.get(string));
++        }
++        System.out.println("--------------------------strApDateList----------------------------");
++        for (String string : ServiceToLoadJson.strApDateList) {
++            System.out.println(string);
++        }
++        System.out.println("--------------------------strAnnDateList----------------------------");
++        for (String string : ServiceToLoadJson.strAnnDateList) {
++            System.out.println(string);
++        }
++        System.out.println("--------------------------strInventorList----------------------------");
++        for (String string : ServiceToLoadJson.strInventorList) {
++            System.out.println(string);
++        }
++        System.out.println("--------------------------strMainIPCList----------------------------");
++        for (String string : ServiceToLoadJson.strMainIPCList) {
++            System.out.println(string);
++        }
++        System.out.println("--------------------------strApplyList----------------------------");
++        for (String string : ServiceToLoadJson.strApplyList) {
++            System.out.println(string);
++        }
++        System.out.println("--------------------------StrCountryCode----------------------------");
++        for (String string : ServiceToLoadJson.strCountryCodeList) {
++            System.out.println(string);
++        }
++
++    }
+ 
+ }
+ 
+ class WorkToJson implements Callable<String> {
+-	private final String keyword;
+-	private final String key;
++    private final String keyword;
+ 
+-	public WorkToJson(String keyword, String key) {
+-		this.keyword = keyword;
+-		this.key = key;
+-	}
++    public WorkToJson(String keyword) {
++        this.keyword = keyword;
++    }
+ 
+-	@Override
+-	public String call() throws Exception {
+-		PatentGetList getList = new PatentGetList(keyword);
+-		String result = getList.getJsonResult(key);
+-        System.out.println(result.trim());
+-		return result;
+-	}
++    @Override
++    public String call() throws Exception {
++        PatentGetList getList = new PatentGetList(keyword);
++        String StrApDate = null;
++        try {
++            StrApDate = getList.getJsonResult("StrApDate");
++            ServiceToLoadJson.strApDateList.add(StrApDate);
++        } catch (Exception e) {
++            ServiceToLoadJson.strApDateList.add("异常");
++            StrApDate = "异常";
++        }
++        String StrAnnDate = null;
++        try {
++            StrAnnDate = getList.getJsonResult("StrAnnDate");
++            ServiceToLoadJson.strAnnDateList.add(StrAnnDate);
++        } catch (Exception e) {
++            ServiceToLoadJson.strAnnDateList.add("异常");
++            StrAnnDate = "异常";
++        }
++        String StrInventor = null;
++        try {
++            StrInventor = getList.getJsonResult("StrInventor");
++            ServiceToLoadJson.strInventorList.add(StrInventor);
++        } catch (Exception e) {
++            ServiceToLoadJson.strInventorList.add("异常");
++            StrInventor = "异常";
++        }
++        String StrMainIPC = null;
++        try {
++            StrMainIPC = getList.getJsonResult("StrMainIPC");
++            ServiceToLoadJson.strMainIPCList.add(StrMainIPC);
++        } catch (Exception e) {
++            ServiceToLoadJson.strMainIPCList.add("异常");
++            StrMainIPC = "异常";
++        }
++        String strApply = null;
++        try {
++            strApply = getList.getJsonResult("StrApply");
++            ServiceToLoadJson.strApplyList.add(strApply);
++        } catch (Exception e) {
++            ServiceToLoadJson.strApplyList.add("异常");
++            strApply = "异常";
++        }
++        String strCountryCode = null;
++        try {
++            strCountryCode = getList.getJsonResult("StrCountryCode");
++            ServiceToLoadJson.strCountryCodeList.add(strCountryCode);
++        } catch (Exception e) {
++            ServiceToLoadJson.strCountryCodeList.add("异常");
++            strCountryCode = "异常";
++        }
++        return StrApDate + StrAnnDate + StrInventor + StrMainIPC + strApply + strCountryCode;
++    }
+ 
+ }
+Index: src/main/java/patent/service/LawQueryResult.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package patent.service;\r\n\r\nimport okhttp3.Call;\r\nimport okhttp3.OkHttpClient;\r\nimport okhttp3.Request;\r\nimport okhttp3.Response;\r\nimport patent.service.constant.PatentInfo;\r\n\r\nimport java.io.IOException;\r\n\r\n/**\r\n * @author ：Y.Bear\r\n * @date ：Created in 2019/6/21 9:22\r\n * @description：获取法律状态采用get方法\r\n * @modified By：\r\n * @version: $\r\n */\r\npublic class LawQueryResult {\r\n    OkHttpClient client = new OkHttpClient();\r\n\r\n    public String getUrl(String target) {\r\n        StringBuilder url = new StringBuilder(PatentInfo.LawQueryResult_Url + \"?\");\r\n        url.append(\"type=\").append(\"falv\").append(\"&\").append(\"hitCount=3&\").append(\"SearchNo=007&\").append(\"AppNo=\").append(target);\r\n        System.out.println(url);\r\n        return url.toString();\r\n    }\r\n\r\n    public String run(String target) throws IOException {\r\n\r\n        Request request =\r\n                new Request.Builder().url(getUrl(target)).addHeader(PatentInfo.Origin, \"http://www.patentstar.cn\").addHeader(\r\n                        \"Content-Type\", \"application/x-www-form-urlencoded\").addHeader(\"User-Agent\",\r\n                        PatentInfo.User_Agent).addHeader(\"Accept\", \"text/html,application/xhtml+xml,application/xml;\" +\r\n                        \"q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\").addHeader(\"Upgrade\" +\r\n                        \"-Insecure-Requests\", \"1\").addHeader(\"Cookie\", PatentInfo.Cookie).build();\r\n        Call call = client.newCall(request);\r\n        Response response = call.execute();\r\n        System.out.println(response.toString());\r\n        return response.body().string();\r\n    }\r\n\r\n    public String getLawResult(String target) throws IOException {\r\n        String response = run(target);\r\n        System.out.println(response);\r\n        return response;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/patent/service/LawQueryResult.java	(revision 0008bdd0de38a31ac0c0800c6b40c9790f72d4df)
++++ src/main/java/patent/service/LawQueryResult.java	(date 1561102394837)
+@@ -41,7 +41,7 @@
+ 
+     public String getLawResult(String target) throws IOException {
+         String response = run(target);
+-        System.out.println(response);
++        //   System.out.println(response);
+         return response;
+     }
+ }
+Index: src/main/java/patent/service/ServiceToLoadLaw.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package patent.service;\r\n\r\nimport util.StringUtils;\r\n\r\nimport java.io.BufferedReader;\r\nimport java.io.File;\r\nimport java.io.FileOutputStream;\r\nimport java.io.IOException;\r\nimport java.io.InputStreamReader;\r\nimport java.nio.charset.StandardCharsets;\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\nimport java.util.Map;\r\n\r\n/**\r\n * @author ：Y.Bear\r\n * @date ：Created in 2019/6/21 9:47\r\n * @description：加载法律状态\r\n * @modified By：\r\n * @version: $\r\n */\r\npublic class ServiceToLoadLaw {\r\n    LawQueryResult queryResult = new LawQueryResult();\r\n\r\n    public void loadLaw() throws IOException {\r\n        List<String> list = new ArrayList<>();\r\n        Map<String, String> map = new HashMap<>();\r\n        long start = System.currentTimeMillis();\r\n        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));\r\n        System.out.println(\"请输入数据量\");\r\n        int num = Integer.parseInt(bufferedReader.readLine());\r\n        System.out.println(\"请输入数据\");\r\n        for (int i = 0; i < num; i++) {\r\n            String key = bufferedReader.readLine().trim();\r\n            if (key.length() == 16) {\r\n                key = StringUtils.removeFirstAndLast(StringUtils.removeFirstAndLast(key));\r\n            }\r\n            list.add(key);\r\n        }\r\n        FileOutputStream fos = null;\r\n        for (String keyword : list) {\r\n            String result = queryResult.getLawResult(keyword);\r\n            String folder =\r\n                    System.getProperty(\"user.dir\") + System.getProperty(\"file.separator\") + \"htmls\" + System.getProperty(\"file.separator\") + keyword + \".html\";\r\n            File html = new File(folder);\r\n            if (!html.exists()) {\r\n                html.createNewFile();\r\n            }\r\n            fos = new FileOutputStream(html);\r\n            fos.write(result.getBytes(StandardCharsets.UTF_8));\r\n        }\r\n        fos.close();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/patent/service/ServiceToLoadLaw.java	(revision 0008bdd0de38a31ac0c0800c6b40c9790f72d4df)
++++ src/main/java/patent/service/ServiceToLoadLaw.java	(date 1561088832328)
+@@ -42,7 +42,8 @@
+         for (String keyword : list) {
+             String result = queryResult.getLawResult(keyword);
+             String folder =
+-                    System.getProperty("user.dir") + System.getProperty("file.separator") + "htmls" + System.getProperty("file.separator") + keyword + ".html";
++                    System.getProperty("user.dir") + System.getProperty("file.separator") + "good1-300" + System.getProperty(
++                            "file.separator") + keyword + ".html";
+             File html = new File(folder);
+             if (!html.exists()) {
+                 html.createNewFile();
+Index: src/main/java/patent/service/constant/PatentInfo.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package patent.service.constant;\r\n\r\nimport okhttp3.MediaType;\r\n\r\n/**\r\n * @author Y.bear\r\n * @version 创建时间：2018年10月9日 下午2:11:15 类说明\r\n */\r\npublic class PatentInfo {\r\n    public static final MediaType JSON = MediaType.get(\"application/json; charset=utf-8\");\r\n    public static final String GetPageList_Url = \"http://www.patentstar.cn/comm/GetList.aspx/GetPageList\";\r\n    public static final String DoPatSearch_Url = \"http://www.patentstar.cn/my/SmartQuery.aspx/DoPatSearch\";\r\n    public static final String LawQueryResult_Url = \"http://www.patentstar.cn/My/LawQueryResult.aspx\";\r\n    public static final String Cookie = \"UM_distinctid=16b7254f09423e-067a455667214d-e343166-100200-16b7254f095165; \" +\r\n            \"CNZZDATA4400375=cnzz_eid%3D96484810-1560988433-%26ntime%3D1561081401; ASP\" +\r\n            \".NET_SessionId=tlcnhvcqqh3vc4fn4vw3czix\";\r\n    public static final String Accept_Language = \"Accept-Language\";\r\n    public static final String Accept_Encoding = \"Accept-Encoding\";\r\n    public static final String User_Agent = \"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like \" +\r\n            \"Gecko) Chrome/67.0.3396.87 Safari/537.36\";\r\n    public static final String X_Requested_With = \"X-Requested-With\";\r\n    public static final String Origin = \"Origin\";\r\n    public static final String Content_Type_Json = \"application/json; charset=UTF-8\";\r\n    public static final String Content_Type_X_www_form_urlencoded = \"application/x-www-form-urlencoded; charset=UTF-8\";\r\n    public static final String Cache_Control = \"no-cache\";\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/patent/service/constant/PatentInfo.java	(revision 0008bdd0de38a31ac0c0800c6b40c9790f72d4df)
++++ src/main/java/patent/service/constant/PatentInfo.java	(date 1561101449457)
+@@ -12,8 +12,8 @@
+     public static final String DoPatSearch_Url = "http://www.patentstar.cn/my/SmartQuery.aspx/DoPatSearch";
+     public static final String LawQueryResult_Url = "http://www.patentstar.cn/My/LawQueryResult.aspx";
+     public static final String Cookie = "UM_distinctid=16b7254f09423e-067a455667214d-e343166-100200-16b7254f095165; " +
+-            "CNZZDATA4400375=cnzz_eid%3D96484810-1560988433-%26ntime%3D1561081401; ASP" +
+-            ".NET_SessionId=tlcnhvcqqh3vc4fn4vw3czix";
++            "ASP.NET_SessionId=4ns5l0uhjggsraqmxcowwvt3; " +
++            "CNZZDATA4400375=cnzz_eid%3D96484810-1560988433-%26ntime%3D1561100329";
+     public static final String Accept_Language = "Accept-Language";
+     public static final String Accept_Encoding = "Accept-Encoding";
+     public static final String User_Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like " +
+Index: src/main/java/app/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package app;\r\n\r\nimport patent.service.ServiceToLoadHtml;\r\nimport patent.service.ServiceToLoadJson;\r\nimport patent.service.ServiceToLoadLaw;\r\n\r\n/**\r\n * @author Y.bear\r\n * @version 创建时间：2018年10月19日 下午2:34:38 类说明\r\n */\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n        ServiceToLoadHtml serviceToLoadHtml = new ServiceToLoadHtml();\r\n        ServiceToLoadJson serviceToLoadJson = new ServiceToLoadJson();\r\n        ServiceToLoadLaw serviceToLoadLaw = new ServiceToLoadLaw();\r\n        try {\r\n            //\tserviceToLoadHtml.loadHtml();\r\n            // serviceToLoadJson.loadJson();\r\n            serviceToLoadLaw.loadLaw();\r\n        } catch (Exception e) {\r\n            System.out.println(\"程序崩溃\" + e);\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/app/Main.java	(revision 0008bdd0de38a31ac0c0800c6b40c9790f72d4df)
++++ src/main/java/app/Main.java	(date 1561102394757)
+@@ -15,8 +15,8 @@
+         ServiceToLoadLaw serviceToLoadLaw = new ServiceToLoadLaw();
+         try {
+             //	serviceToLoadHtml.loadHtml();
+-            // serviceToLoadJson.loadJson();
+-            serviceToLoadLaw.loadLaw();
++            serviceToLoadJson.loadJson();
++            // serviceToLoadLaw.loadLaw();
+         } catch (Exception e) {
+             System.out.println("程序崩溃" + e);
+         }

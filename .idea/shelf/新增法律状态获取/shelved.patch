@@ -1,0 +1,62 @@
+Index: src/main/java/patent/service/LawQueryResult.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package patent.service;\r\n\r\nimport okhttp3.Call;\r\nimport okhttp3.OkHttpClient;\r\nimport okhttp3.Request;\r\nimport okhttp3.Response;\r\nimport patent.service.constant.PatentInfo;\r\n\r\nimport java.io.IOException;\r\n\r\n/**\r\n * @author ：Y.Bear\r\n * @date ：Created in 2019/6/21 9:22\r\n * @description：获取法律状态采用get方法\r\n * @modified By：\r\n * @version: $\r\n */\r\npublic class LawQueryResult {\r\n    OkHttpClient client = new OkHttpClient();\r\n\r\n    public String getUrl(String target) {\r\n        StringBuilder url = new StringBuilder(PatentInfo.LawQueryResult_Url + \"?\");\r\n        url.append(\"type=\").append(\"falv\").append(\"&\").append(\"hitCount=3&\").append(\"SearchNo=007&\").append(\"AppNo=\").append(target);\r\n        System.out.println(url);\r\n        return url.toString();\r\n    }\r\n\r\n    public String run(String target) throws IOException {\r\n\r\n        Request request =\r\n                new Request.Builder().url(getUrl(target)).addHeader(PatentInfo.Origin, \"http://www.patentstar.cn\").addHeader(\r\n                        \"Content-Type\", \"application/x-www-form-urlencoded\").addHeader(\"User-Agent\",\r\n                        PatentInfo.User_Agent).addHeader(\"Accept\", \"text/html,application/xhtml+xml,application/xml;\" +\r\n                        \"q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3\").addHeader(\"Upgrade\" +\r\n                        \"-Insecure-Requests\", \"1\").addHeader(\"Cookie\", PatentInfo.Cookie).build();\r\n        Call call = client.newCall(request);\r\n        Response response = call.execute();\r\n        System.out.println(response.toString());\r\n        return response.body().string();\r\n    }\r\n\r\n    public String getLawResult(String target) throws IOException {\r\n        String response = run(target);\r\n        System.out.println(response);\r\n        return response;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/patent/service/LawQueryResult.java	(revision 0008bdd0de38a31ac0c0800c6b40c9790f72d4df)
++++ src/main/java/patent/service/LawQueryResult.java	(date 1561086465714)
+@@ -41,7 +41,7 @@
+ 
+     public String getLawResult(String target) throws IOException {
+         String response = run(target);
+-        System.out.println(response);
++        //  System.out.println(response);
+         return response;
+     }
+ }
+Index: src/main/java/patent/service/ServiceToLoadLaw.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package patent.service;\r\n\r\nimport util.StringUtils;\r\n\r\nimport java.io.BufferedReader;\r\nimport java.io.File;\r\nimport java.io.FileOutputStream;\r\nimport java.io.IOException;\r\nimport java.io.InputStreamReader;\r\nimport java.nio.charset.StandardCharsets;\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\nimport java.util.Map;\r\n\r\n/**\r\n * @author ：Y.Bear\r\n * @date ：Created in 2019/6/21 9:47\r\n * @description：加载法律状态\r\n * @modified By：\r\n * @version: $\r\n */\r\npublic class ServiceToLoadLaw {\r\n    LawQueryResult queryResult = new LawQueryResult();\r\n\r\n    public void loadLaw() throws IOException {\r\n        List<String> list = new ArrayList<>();\r\n        Map<String, String> map = new HashMap<>();\r\n        long start = System.currentTimeMillis();\r\n        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));\r\n        System.out.println(\"请输入数据量\");\r\n        int num = Integer.parseInt(bufferedReader.readLine());\r\n        System.out.println(\"请输入数据\");\r\n        for (int i = 0; i < num; i++) {\r\n            String key = bufferedReader.readLine().trim();\r\n            if (key.length() == 16) {\r\n                key = StringUtils.removeFirstAndLast(StringUtils.removeFirstAndLast(key));\r\n            }\r\n            list.add(key);\r\n        }\r\n        FileOutputStream fos = null;\r\n        for (String keyword : list) {\r\n            String result = queryResult.getLawResult(keyword);\r\n            String folder =\r\n                    System.getProperty(\"user.dir\") + System.getProperty(\"file.separator\") + \"htmls\" + System.getProperty(\"file.separator\") + keyword + \".html\";\r\n            File html = new File(folder);\r\n            if (!html.exists()) {\r\n                html.createNewFile();\r\n            }\r\n            fos = new FileOutputStream(html);\r\n            fos.write(result.getBytes(StandardCharsets.UTF_8));\r\n        }\r\n        fos.close();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/patent/service/ServiceToLoadLaw.java	(revision 0008bdd0de38a31ac0c0800c6b40c9790f72d4df)
++++ src/main/java/patent/service/ServiceToLoadLaw.java	(date 1561085945373)
+@@ -7,7 +7,6 @@
+ import java.io.FileOutputStream;
+ import java.io.IOException;
+ import java.io.InputStreamReader;
+-import java.nio.charset.StandardCharsets;
+ import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.List;
+@@ -48,7 +47,7 @@
+                 html.createNewFile();
+             }
+             fos = new FileOutputStream(html);
+-            fos.write(result.getBytes(StandardCharsets.UTF_8));
++            fos.write(result.getBytes("GBK"));
+         }
+         fos.close();
+     }
+Index: src/main/java/patent/service/constant/PatentInfo.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package patent.service.constant;\r\n\r\nimport okhttp3.MediaType;\r\n\r\n/**\r\n * @author Y.bear\r\n * @version 创建时间：2018年10月9日 下午2:11:15 类说明\r\n */\r\npublic class PatentInfo {\r\n    public static final MediaType JSON = MediaType.get(\"application/json; charset=utf-8\");\r\n    public static final String GetPageList_Url = \"http://www.patentstar.cn/comm/GetList.aspx/GetPageList\";\r\n    public static final String DoPatSearch_Url = \"http://www.patentstar.cn/my/SmartQuery.aspx/DoPatSearch\";\r\n    public static final String LawQueryResult_Url = \"http://www.patentstar.cn/My/LawQueryResult.aspx\";\r\n    public static final String Cookie = \"UM_distinctid=16b7254f09423e-067a455667214d-e343166-100200-16b7254f095165; \" +\r\n            \"CNZZDATA4400375=cnzz_eid%3D96484810-1560988433-%26ntime%3D1561081401; ASP\" +\r\n            \".NET_SessionId=tlcnhvcqqh3vc4fn4vw3czix\";\r\n    public static final String Accept_Language = \"Accept-Language\";\r\n    public static final String Accept_Encoding = \"Accept-Encoding\";\r\n    public static final String User_Agent = \"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like \" +\r\n            \"Gecko) Chrome/67.0.3396.87 Safari/537.36\";\r\n    public static final String X_Requested_With = \"X-Requested-With\";\r\n    public static final String Origin = \"Origin\";\r\n    public static final String Content_Type_Json = \"application/json; charset=UTF-8\";\r\n    public static final String Content_Type_X_www_form_urlencoded = \"application/x-www-form-urlencoded; charset=UTF-8\";\r\n    public static final String Cache_Control = \"no-cache\";\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/patent/service/constant/PatentInfo.java	(revision 0008bdd0de38a31ac0c0800c6b40c9790f72d4df)
++++ src/main/java/patent/service/constant/PatentInfo.java	(date 1561086006098)
+@@ -13,7 +13,7 @@
+     public static final String LawQueryResult_Url = "http://www.patentstar.cn/My/LawQueryResult.aspx";
+     public static final String Cookie = "UM_distinctid=16b7254f09423e-067a455667214d-e343166-100200-16b7254f095165; " +
+             "CNZZDATA4400375=cnzz_eid%3D96484810-1560988433-%26ntime%3D1561081401; ASP" +
+-            ".NET_SessionId=tlcnhvcqqh3vc4fn4vw3czix";
++            ".NET_SessionId=dcnegm2zip0m5j1d0p1w4aj5";
+     public static final String Accept_Language = "Accept-Language";
+     public static final String Accept_Encoding = "Accept-Encoding";
+     public static final String User_Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like " +

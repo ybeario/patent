@@ -15,8 +15,8 @@ public class Main {
         ServiceToLoadLaw serviceToLoadLaw = new ServiceToLoadLaw();
         try {
             //	serviceToLoadHtml.loadHtml();
-            // serviceToLoadJson.loadJson();
-            serviceToLoadLaw.loadLaw();
+             serviceToLoadJson.loadJson();
+           // serviceToLoadLaw.loadLaw();
         } catch (Exception e) {
             System.out.println("程序崩溃" + e);
         }

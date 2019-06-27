@@ -12,8 +12,8 @@ public class PatentInfo {
     public static final String DoPatSearch_Url = "http://www.patentstar.cn/my/SmartQuery.aspx/DoPatSearch";
     public static final String LawQueryResult_Url = "http://www.patentstar.cn/My/LawQueryResult.aspx";
     public static final String Cookie = "UM_distinctid=16b7254f09423e-067a455667214d-e343166-100200-16b7254f095165; " +
-            "CNZZDATA4400375=cnzz_eid%3D96484810-1560988433-%26ntime%3D1561081401; ASP" +
-            ".NET_SessionId=tlcnhvcqqh3vc4fn4vw3czix";
+            "CNZZDATA4400375=cnzz_eid%3D96484810-1560988433-%26ntime%3D1561100329; ASP" +
+            ".NET_SessionId=rloz5hsk5xd11owmpbpfaize";
     public static final String Accept_Language = "Accept-Language";
     public static final String Accept_Encoding = "Accept-Encoding";
     public static final String User_Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like " +

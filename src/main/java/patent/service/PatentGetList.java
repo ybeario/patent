@@ -122,6 +122,7 @@ public class PatentGetList {
 		String NO = doPatSearch.getResult();
 		String json = bowlingJson(NO);
 		Response response = post(PatentInfo.GetPageList_Url, json, NO);
+		System.out.println(response);
 		String result = handler(response.body().string(), key);
 		if (key.equals("StrInventor")) {
 			result = "人数(" + StringUtils.checkNumOfSymbol(result, ';') + ")" + result;
