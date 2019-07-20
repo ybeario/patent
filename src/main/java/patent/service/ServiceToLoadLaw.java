@@ -1,5 +1,6 @@
 package patent.service;
 
+import patent.service.constant.PatentInfo;
 import util.StringUtils;
 
 import java.io.BufferedReader;
@@ -7,10 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author ：Y.Bear
@@ -22,6 +20,8 @@ import java.util.Map;
 public class ServiceToLoadLaw {
     LawQueryResult queryResult = new LawQueryResult();
     LawQuery query = new LawQuery();
+    Soopat soopat = new Soopat();
+    Random random = new Random();
 
     public void loadLaw() throws Exception {
         List<String> list = new ArrayList<>();
@@ -43,15 +43,26 @@ public class ServiceToLoadLaw {
         for (String keyword : list) {
             hitCount++;
             //String result = queryResult.getLawResult(keyword,hitCount);
-            String result = query.getLawPage(keyword);
+            //String result = query.getLawPage(keyword);
+            String result = soopat.getPage(PatentInfo.SooPAT_URL, keyword);
             String folder =
                     System.getProperty("user.dir") + System.getProperty("file.separator") + "htmls" + System.getProperty("file.separator") + keyword + ".html";
             File html = new File(folder);
             if (!html.exists()) {
                 html.createNewFile();
             }
+            System.out.println("当前网页大小:" + result.length());
+            if (result.length() == 7398) {
+                System.out.println("需要验证码！！！");
+                Thread.sleep(10000);
+                result = soopat.getPage(PatentInfo.SooPAT_URL, keyword);
+            } else {
+                System.out.println("成功！！！");
+            }
             fos = new FileOutputStream(html);
             fos.write(result.getBytes(StandardCharsets.UTF_8));
+
+            Thread.sleep(3000);
         }
         fos.close();
     }
